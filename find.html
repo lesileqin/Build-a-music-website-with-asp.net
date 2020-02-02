@@ -1,0 +1,127 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="css/css.css" />
+    <script src="js/jquery.min.js"></script>
+    <style>
+        *{
+            padding:0px;
+            margin:0px;
+            font-family:"Comic Sans MS","微软雅黑",sans-serif;
+            color:#7f7f7f;
+        }
+        .leftmenu{
+            border:1px solid #808080;
+            width:130px;
+            height:130px;
+            border-radius:130px;
+            text-align:center;
+            line-height:130px;
+            margin:auto;
+            margin-top:30px;
+            cursor:pointer;
+        }
+        .selectLeftMenu{
+            background-color:rgb(255,139,27);
+            border:none;
+            color:white;
+            font-weight:600;
+        }
+    </style>
+    <script>
+        var pageInt = 1;
+        var pageCount = 5;
+        var count = 1;
+        $(function () {
+            tuijian();
+        });
+        //获取查询
+        function tuijian() {
+            var pd = { "t": "GetFind", "pageInt": pageInt, "pageCount": pageCount };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        $("#rank").empty();
+                        var dataobj = eval("(" + data.status + ")");
+                        $.each(dataobj.root, function (i, item) {
+                            var html = ' <div style="margin-top:20px;border:1px solid #b7b7b7;border-left:none;border-right:none;border-top:none;height:100px;padding-top:10px;padding-bottom:10px;width:100%;">' +
+                                ' <div style="float:left;height:100px;line-height:100px;margin-left:40px;"><input name="music" type="checkbox" value="' + item.musicPath + '" /></div>' +
+                                ' <div style="float:left;height:100px;line-height:100px;margin-left:40px;"><font style="font-size:20px;">' + count + '</font></div>' +
+                                ' <div style="float:left;height:100px;line-height:100px;margin-left:40px;"><img src="' + item.imgs + '" style="height:100px;width:100px;" /></div>' +
+                                ' <div style="float:left;height:50px;margin-left:20px;width:200px;margin-top:50px;">' + item.musicName + '<br />' + item.singerName + '</div>' +
+                                ' <div style="float:left;height:50px;margin-left:100px;width:50px;margin-top:50px;cursor:pointer;" onclick="linsen(\'' + item.musicPath + '\')">播放</div>' +
+                                ' <div style="float:left;height:50px;margin-left:0px;width:50px;margin-top:50px;cursor:pointer;" onclick="down(\'' + item.musicPath + '\')">下载</div>' +
+                                '</div>';
+                            count++;
+                            $("#rank").append(html);
+                        });
+                        $("#addMore").show();
+                        //count++;
+                    } else {
+                        $("#rank").html("<div style='text-align:center;'>没有查询到任何歌曲</div>");
+                        $("#addMore").hide();
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("获取查询界面出错，请检查find.html页面的tuijian方法或者前往Handler.ashx页面查错GetFind方法");
+                }
+            });
+        }
+        //试听
+        function linsen(a) {
+            var pd = { "t": "lisem", "mp3": a };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1")
+                        window.parent.Eject("lisen.html", "", 360, 250);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("试听出错，请检查find.html页面的linsen方法或者前往Handler.ashx页面检查lisem方法");
+                }
+            });
+        }
+        //下载
+        function down(a) {
+            window.open("musicFile/" + a);
+        }
+        //单击加载更多
+        function add() {
+            pageInt += 1;
+            tuijian();
+        }
+        //播放所选
+        function lisenAll() {
+            var musiclist = "";
+            $("input[name='music']:checked").each(function () {
+                musiclist += $(this).val() + ";";
+            });
+            if (musiclist == "") {
+                alert("您没有选中任何音乐");
+                return;
+            }
+            linsen(musiclist);
+        }
+    </script>
+</head>
+<body>
+    <div style="width:900px;height:40px;font-size:25px;padding-left:50px;margin-top:20px;background-color:#fff">
+
+    </div>
+    <div id="rank" style="background-color:#fff">
+
+    </div>
+    <div style="width:900px;height:40px;font-size:25px;padding-left:50px;background-color:#fff">
+
+    </div>
+</body>
+</html>

@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/Exect.js"></script>
+    <script>
+        var musicList = new Array();//歌曲列表
+        var int = 0;//当前播放数
+        $(function () {
+            GetMp3();
+            //绑定方法，音乐播放完成的触发
+            $('#source').bind('ended', function () {
+                int = int + 1;//当前的音乐索引加1
+                if (musicList.length - 1 == int) {
+                    $('#musicName').html('已经听完了！');//如果已经没有歌曲可以播放了，就显示提示信息
+                    return;
+                }
+                $('#musicName').html(musicList[int]);//添加当前播放的歌曲名称
+                $('#source').attr('src', "musicFile/" + musicList[int]);//设置歌曲链接
+                document.getElementById('source').play();//播放当前歌曲
+            });
+        });
+
+        //获取MP3
+        function GetMp3() {
+            var pd = { "t": "getlisen" };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        var mp3 = data.status;
+                        musicList = mp3.split(';');
+                        console.log(musicList[int]);
+                        $("#musicName").html(musicList[int]);
+                        $("#source").attr("src", "musicFile/" + musicList[int]);
+                        document.getElementById("source").play();
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("lisen.html页面出错，请检查GetMp3或Handler.cs页面");
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+    <div id="musicName" style="width:50px;margin:auto;padding-top:60px;"></div>
+    <audio id="source" controls style="margin-top:60px;margin-left:20px;"></audio>
+</body>
+</html>

@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="css/css.css" rel="stylesheet" />
+    <script src="js/jquery.min.js"></script>
+    <style>
+        *{
+            padding:0px;
+            margin:0px;
+            font-family:"Comic Sans MS","微软雅黑",sans-serif;
+            color:#7f7f7f;
+        }
+        .leftmenu{
+            border:1px solid #808080;
+            width:130px;
+            height:130px;
+            border-radius:130px;
+            text-align:center;
+            line-height:130px;
+            margin:auto;
+            margin-top:30px;
+            cursor:pointer;
+        }
+        .selectLeftMenu{
+            background-color:rgb(255,139,27);
+            border:none;
+            color:white;
+            font-weight:600;
+        }
+    </style>
+    <script>
+        $(function () {
+            tuijina();
+        });
+
+        var pageInt = 1;
+        var pageCount = 5;
+        var count = 1;
+        //获取收藏
+        function tuijina() {
+            var pd = { "t": "GetMyLove", "pageInt": pageInt, "pageCount": pageCount };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        $('#rank').empty();
+                        var dataobj = eval("(" + data.status + ")");
+                        $.each(dataobj.root, function (i, item) {
+                            var html = ' <div style="margin-top:20px;border:1px solid #b7b7b7;border-left:none;border-right:none;border-top:none;height:100px;padding-top:10px;padding-bottom:10px;width:100%;">' +
+                                ' <div style="float:left;height:100px;line-height:100px;margin-left:40px;"><input name="music" type="checkbox" value="' + item.musicPath + '" /></div>' +
+                                ' <div style="float:left;height:100px;line-height:100px;margin-left:40px;"><font style="font-size:20px;">' + count + '</font></div>' +
+                                ' <div style="float:left;height:100px;line-height:100px;margin-left:40px;"><img src="' + item.imgs + '" style="height:100px;width:100px;" /></div>' +
+                                ' <div style="float:left;height:50px;margin-left:20px;width:200px;margin-top:50px;">' + item.musicName + '<br />' + item.singerName + '</div>' +
+                                ' <div style="float:left;height:50px;margin-left:100px;width:50px;margin-top:50px;cursor:pointer;" onclick="linsen(\'' + item.musicPath + '\')">播放</div>' +
+                                ' <div style="float:left;height:50px;margin-left:0px;width:50px;margin-top:50px;cursor:pointer;" onclick="down(\'' + item.musicPath + '\')">下载</div>' +
+                                '</div>';
+                            $('#rank').append(html);
+                            count++;
+                        });
+                        $('#addMore').show();
+                    }
+                    else {
+                        $('#addMore').hide();
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("获取收藏功能出错，请前往Mymusic.html检查tuijina方法或者前往Handler.ashx页面检查GetMylove方法");
+                }
+            });
+        }
+
+         $(function () {
+            var pd = { "t": "CheckLogin" };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status == "-1") {
+                        window.location.href = 'lgoin.html';
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) { }
+
+            });
+        });
+//播放所选
+        function lisenAll() {
+            //所选择的音乐列表
+            var musiclist = '';
+            //获取所选音乐
+            $('input[name = "music"]:checked').each(function () {
+                musiclist += $(this).val() + ";";
+            });
+            //如果没有选择，弹出提示 
+            if (musiclist == '') {
+                alert('您没有选中任何音乐');
+                return;
+            }
+            //听音乐
+            linsen(musiclist);
+        }
+        //试听
+        function linsen(a) {
+            var pd = { "t": "lisem", "mp3": a };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        window.parent.Eject('lisen.html', '', 360, 250);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                }
+            });
+        }
+
+    </script>
+</head>
+<body>
+    <div><font onclick="lisenAll()">播放所选</font></div>
+    <div style="width:900px;height:40px;font-size:25px; padding-left:50px;margin-top:20px;">
+    </div>
+    <div id="rank">
+        <div style="margin-top:20px;border:1px solid #b7b7b7;border-left:none;border-right:none;border-top:none;height:100px;padding-top:10px;padding-bottom:10px;width:100%;">
+            <div style="float:left;height:100px;line-height:100px;margin-left:40px;">
+                <input name="music" type="checkbox" value="" />
+            </div>
+            <div style="float:left;height:100px;line-height:100px;margin-left:40px;">
+                <font style="font-size:20px;"></font>
+            </div>
+            <div style="float:left;height:100px;line-height:100px;margin-left:40px;">
+                <img src="OrderImg/2.jpg" style="height:100px;width:100px;" />
+            </div>
+            <div style="float:left;height:50px;margin-left:20px;width:200px;margin-top:50px;">
+                一首简单的歌曲
+            </div>
+            <div style="float:left;height:50px;margin-left:100px;width:50px;margin-top:50px;cursor:pointer;">播放</div>
+            <div style="float:left;height:50px;margin-left:0px;width:50px;margin-top:50px;cursor:pointer;">下载</div>
+        </div>
+    </div>
+</body>
+</html>

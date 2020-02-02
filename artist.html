@@ -1,0 +1,165 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+    <link href="css/css.css" rel="stylesheet" />
+    <script src="js/jquery.min.js"></script>
+    <style>
+        * {
+            padding: 0px;
+            margin: 0px;
+            font-family: "Comic Sans MS","微软雅黑",sans-serif;
+            color: #000;
+        }
+
+       .leftmenu {
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            line-height: 130px;
+            margin: auto;
+            margin-top: 30px;
+            cursor: pointer;
+        }
+
+        .selectLeftMenu {
+            background-color: rgb(255, 139, 27);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+        /*语言样式*/
+        .topMenu {
+            height: 50px;
+            width: 70px;
+            float: left;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+           
+        }
+    </style>
+    <script>
+        var phType = '';//排行类型
+        var country = '';//国家
+        var pageInt = 1;//第几页
+        var pageCount = 12;//一页多少条
+        $(function () {
+            tuijina();
+        });
+        //获取推荐
+        function tuijina() {
+            var pd = { "t": "GetZj", "phType": phType, "country": country, "pageInt": pageInt, "pageCount": pageCount };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        //$('#rank').empty();
+                        var dataobj = eval("(" + data.status + ")");
+                        $.each(dataobj.root, function (i, item) {
+                            var html = ' <div style="width:130px;margin-top:20px;cursor:pointer;margin-left:30px;float:left;"  onclick="onclickyiren(\'' + item.singerName + '\')">' +
+                                       '     <img src="' + item.zjimg + '" style="width:130px;height:150px;"/>' +
+                                       '     <div style="text-align:center;width:130px;">' + item.singerName + '</div>' +
+                                       ' </div>';
+                            $('#rank').append(html);
+                        });
+                        $('#addMore').show();
+                    }
+                    else {
+                        $('#addMore').hide();
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                }
+            });
+        }
+        //设置国家
+        function conClick(a,b) {
+            $('#rank').empty();
+            count = 1;
+            country = a;
+            pageInt = 1;
+            tuijina();
+            $('.topMenu').css('color', '#000');
+            $(b).css('color', '#F59405')
+        }
+        //设置排行类型
+        function setClass(a, b) {
+            $('#rank').empty();
+            count = 1;
+            phType = a;
+            pageInt = 1;
+            tuijina();
+            $('.selectLeftMenu').attr('class', 'leftmenu');
+            $(b).attr('class', 'leftmenu selectLeftMenu');
+        }
+        //点击加载更多
+        function add() {
+            pageInt += 1;
+            tuijina()
+        }
+        //点击艺人
+        function onclickyiren(a) {
+            var pd = { "t": "SetArtist", "Artist": a };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        window.location.href = 'artistDelis.html';
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                }
+            });
+
+        }
+    </script>
+</head>
+<body>
+    <div style="width:100%; height:1200px;background-color:#fff;">
+        <div style="height:800px;width:180px;border:1px solid #b7b7b7; float:left;margin-left:0px;">
+            <div style="width:100%;height:50px;font-size:20px;font-weight:900;text-align:center;margin-top:30px;color:#F59405">甜橙音乐网</div>
+            <div class="leftmenu" onclick="setClass(0,this)" style="background-image:url(gp/本周流行.png)"></div>
+            <div class="leftmenu" onclick="setClass(1,this)" style="background-image:url(gp/热门艺人.png)"></div>
+        </div>
+        <div style="width:681px;height:800px;float:right;">
+            <div style="border-bottom:1px solid #b7b7b7;height:50px;border-top:1px solid #b7b7b7;">
+                <div class="topMenu" onclick="conClick('',this)">
+                    全部
+                </div>
+                <div class="topMenu" onclick="conClick('华语', this)">
+                    华语
+                </div>
+                <div class="topMenu" onclick="conClick('欧美', this)">
+                    欧美
+                </div>
+                <div class="topMenu" onclick="conClick('日本', this)">
+                    日本
+                </div>
+                <div class="topMenu" onclick="conClick('韩国', this)">
+                    韩国
+                </div>
+            </div>
+            <div id="rank">
+
+            </div>
+            <div style="height:10px;width:100%;clear:both;"></div>
+            <div id="addMore" style="text-align:center;height:200px;display:none;">
+                <div style="height:60px;background-color:rgb(255, 106, 0);border-radius:20px;margin-top:20px;color:white;font-weight:900;line-height:60px;cursor:pointer;" onclick="add()">点击加载更多</div>
+            </div>
+            
+        </div>
+        <div style="width:800px; clear:both; margin-left:50px; ">
+                <img src="tools/页脚.png" style="margin-top:150px;" />
+            </div>
+        </div>
+</body>
+</html>

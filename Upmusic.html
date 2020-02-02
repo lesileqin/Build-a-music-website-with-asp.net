@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+    <link href="css/css.css" rel="stylesheet" />
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.form.min.js"></script>
+    <script>
+        $(function () {
+            //是否登录
+            var pd = { "t": "CheckLogin" };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status == "-1") {
+                        window.location.href = 'lgoin.html';
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                }
+            });
+        });
+        //上传
+        function fileUp() {
+            //提交id为form1的表单，提交到UploadImage.ashx，提交方式为post
+            $("#form1").ajaxSubmit({
+                url: 'tools/UploadImage.ashx',
+                type: "post",
+                success: function (data) {
+                    //如果从后台返回的不是"上传失败"，则设置图片的路径，之后隐藏，之后在2000毫秒的时间
+                    //进行动画显示
+                    if (data != "上传失败") {
+                        $("#fname").val(data);
+                    }
+                    else {
+                        alert("上传失败");
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                }
+            });
+        }
+        //上传
+        function fileUp2() {
+            //提交id为form1的表单，提交到UploadImage.ashx，提交方式为post
+            $("#form2").ajaxSubmit({
+                url: 'tools/UploadImage.ashx',
+                type: "post",
+                success: function (data) {
+                    //如果从后台返回的不是"上传失败"，则设置图片的路径，之后隐藏，之后在2000毫秒的时间
+                    //进行动画显示
+                    if (data != "上传失败") {
+                        $("#fname2").val(data);
+                    }
+                    else {
+                        alert("上传失败");
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                }
+            });
+        }
+        function upMusic() {
+            var zj = $('#zj').val();
+            var zjtp = $('#zjtp').val();
+            var gs = $('#gs').val();
+            var fg = $('#fg').val();
+            var mc = $('#mc').val();
+            var gj = $('#gj').val();
+            var fname = $('#fname').val();
+            var tp = $('#fname2').val();
+            if (mc == "") {
+                alert('没有填写歌曲名称');
+                return;
+            }
+            if (fname == "") {
+                alert('没有上传歌曲');
+                return;
+            }
+            if (tp == "") {
+                alert('没有上传歌曲图片');
+                return;
+            }
+            //上传歌曲
+            var pd = { "t": "upmusic", "zj": zj, "zjtp": zjtp, "gs": gs, "fg": fg, "mc": mc, "fname": fname, "gj": gj, "tp": tp };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status == "1") {
+                        alert('上传成功');
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                }
+            });
+        }
+    </script>
+</head>
+<body >
+    <div style="background-color:#fff; height:1200px;width:100%; padding-top:40px;">
+        <div style="width:400px; margin-left:auto; margin-right:auto;">
+            <div style="clear:both;height:20px;">
+                <div style="float:left; width:100px; ">专辑名称：</div>
+                <div style="float:left; width:150px;">
+                    <select id="zj">
+                        <option value="听我想听">听我想听</option>
+                        <option value="简单歌曲">简单歌曲</option>
+                        <option value="这是一张专辑">这是一张专辑</option>
+                        <option value="倒带">倒带</option>
+                        <option value="广岛之恋">广岛之恋</option>
+                        <option value="菩提树">菩提树</option>
+                        <option value="远方">远方</option>
+                        <option value="红歌">红歌</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:15px;clear:both;height:20px;">
+                <div style="float:left; width:100px; ">专辑图片：</div>
+                <div style="float:left; width:150px;">
+                    <select id="zjtp">
+                        <option value="OrderImg/1-2.png">1-2.png</option>
+                        <option value="OrderImg/1-3.png">1-3.png</option>
+                        <option value="OrderImg/1-4.png">1-4.png</option>
+                        <option value="OrderImg/1-5.png">1-5.png</option>
+                        <option value="OrderImg/1.png">1.png</option>
+                        <option value="OrderImg/2.png">2.png</option>
+                        <option value="OrderImg/3.png">3.png</option>
+                        <option value="OrderImg/4.png">4.png</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:15px;clear:both;height:20px;">
+                <div style="float:left; width:100px; ">歌手：</div>
+                <div style="float:left; width:150px;">
+                    <select id="gs">
+                        <option value="刘若英">刘若英</option>
+                        <option value="周杰伦">周杰伦</option>
+                        <option value="筷子星弟">筷子星弟</option>
+                        <option value="梁静茹">梁静茹</option>
+                        <option value="席婷峰">席婷峰</option>
+                        <option value="麦当娜">麦当娜</option>
+                        <option value="杰克逊">杰克逊</option>
+                        <option value="杨坤">杨坤</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:15px;clear:both;height:20px;">
+                <div style="float:left; width:100px; ">风格：</div>
+                <div style="float:left; width:150px;">
+                    <select id="fg">
+                        <option value="流行">流行</option>
+                        <option value="摇滚">摇滚</option>
+                        <option value="民谣">民谣</option>
+                        <option value="电子">电子</option>
+                        <option value="节奏布鲁斯">节奏布鲁斯</option>
+                        <option value="爵士">爵士</option>
+                        <option value="轻音乐">轻音乐</option>
+                        <option value="嘻哈">嘻哈</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:15px;clear:both;height:20px;">
+                <div style="float:left; width:100px; ">国家：</div>
+                <div style="float:left; width:150px;">
+                    <select id="gj">
+                        <option value="华语">华语</option>
+                        <option value="欧美">欧美</option>
+                        <option value="日本">日本</option>
+                        <option value="韩国">韩国</option>
+                    </select>
+                </div>
+            </div>
+            <div style="margin-top:15px;clear:both;height:20px;">
+                <div style="float:left; width:100px;">歌曲名称：</div>
+                <div style="float:left; width:150px;">
+                    <input type="text" id="mc" />
+                </div>
+            </div>
+            <div style="margin-top:15px;clear:both;height:20px;">
+                <form id="form1" method="post" enctype="multipart/form-data" action="tools/UploadImage.ashx">
+                    <font>上传歌曲：&nbsp;&nbsp;&nbsp;&nbsp;</font><input type="file" id="uploadImage" name="uploadImage" onchange="fileUp()" />
+                </form>
+                <input type="hidden" id="fname" />
+            </div>
+            <div style="margin-top:15px;clear:both;height:20px;">
+                <form id="form2" method="post" enctype="multipart/form-data" action="tools/UploadImage.ashx">
+                    <font>上传歌曲图片：</font><input type="file" id="uploadimg" name="uploadimg" onchange="fileUp2()" />
+                </form>
+                <input type="hidden" id="fname2" />
+            </div>
+            <div style="margin-top:45px;clear:both;height:20px;">
+                <img src="OrderImg/上船歌曲.png" style="width:120px; height:40px;" onclick="upMusic()" />
+            </div>
+        </div>
+        </div>
+</body>
+</html>

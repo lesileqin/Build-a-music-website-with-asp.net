@@ -1,0 +1,240 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script src="js/jquery.min.js"></script>
+    <link href="css/css.css" rel="stylesheet" />
+    <script src="js/lb.js"></script>
+     <style>
+        * {
+            padding: 0px;
+            margin: 0px;
+            font-family: 'Comic Sans MS',"宋体",sans-serif;
+            color: #7f7f7f;
+        }
+
+        .imgbanner {
+            position: absolute;
+            top: 390px;
+            left: 0px;
+            background-color: rgba(255,255,255,4);
+            height: 75px;
+            width: 100%;
+        }
+
+        .imgbannerDiv {
+            padding-left: 60px;
+        }
+
+            .imgbannerDiv img {
+                width: 150px;
+                height: 70px;
+                margin: 2px 20px;
+                cursor: pointer;
+            }
+    </style>
+    <script>
+        //获取猜你喜欢
+        function CheckLove() {
+            //调用后台方法
+            var pd = { "t": "GetLove" };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    //console.log("1");
+                    if (data.status != "-1") {                      
+                        //滞空div
+                        $("#youlove").empty();
+                        //格式化后台传递过来的数据
+                        var dataobj = eval("(" + data.status + ")");
+                        //循环数据
+                        $.each(dataobj.root, function (i, item) {
+                            
+                            //设置html文本
+                            var html = '<div style="width:160px;height:200px;float:left;margin-left:52px;" onclick="lisen(\'' + item.musicPath + '\')">' +
+                                '   <img src="' + item.imgs + '" style="width:160px;height:160px; cursor:pointer;" />' +
+                                '   <div style="text-align:center;">' + item.musicName + '</div>' +
+                                '   <div style="text-align:center;font-size:8px;">' + item.singerName + '</div>' +
+                                '</div>';
+                            
+                            //向div中添加html
+                            $("#youlove").append(html);
+                        });
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("CheckLove() 获取猜你喜欢界面出错！请查看hot.html页面或者Handler.ashx页面！");
+                }
+            });
+        }
+
+        $(function () {
+            lb();
+            CheckLove();
+            window.setInterval(function () {
+                CheckLove();        //5秒搜索一次
+            }, 5000);
+            tuijian();
+        });
+
+        //获取推荐
+        var gequ = '';
+        function tuijian() {
+            //调用后台方法
+            var pd = { "t": "Gettuijian" };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        //滞空div
+                        $('#tuijian').empty();
+                        //格式化后台传递过来的数据
+                        var dataobj = eval("(" + data.status + ")");
+                        //循环传递过来的数据
+                        $.each(dataobj.root, function (i, item) {
+                            var html = ' <div style="clear:both; border-bottom:1px solid #bababa; height:90px;">' +
+                                '     <img onclick="lisen(\'' + item.musicPath + '\')" src="' + item.imgs + '" style="height:60px;width:60px; margin-top:10px;margin-left:30px;float:left;" />' +
+                                '     <div style="float:right; margin-top:25px;"><div style="float: left; height: 80px; font-weight: 600; margin-left: 60px;">' + item.musicName + '</div>' +
+                                '     <img src="gp/Broadcast.png" style="float:right; margin-right:40px;cursor:pointer" onclick="lisen(\'' + item.musicPath + '\')" />' +
+                                '     <img src="gp/下载.png" style="float:right; margin-right:40px;cursor:pointer" onclick="down(\'' + item.musicPath + '\')" />' +
+                                '     <div style="float:right;margin-left:60px;margin-right:30px;color:rgb(255, 106, 0);cursor:pointer" onclick="setLove(\'' + item.id + '\')">收藏</div></div>' +
+                                '     <div style="float:right;width:400px;line-height:30px;">' +
+                                '     </div>' +
+                                ' </div>';
+                            //添加html文本
+                            $('#tuijian').append(html);
+                            gequ += item.musicPath + ';';
+                        });
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("tuijian()推荐页面出错！请查看hot.html页面或者Handler.ashx页面！");
+                }
+            });
+        }
+        //听推荐的所有歌曲
+        function lisenAll() {
+            var pd = { "t": "lisem", "mp3": gequ };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        window.location.href = "lisen.html";
+                        //window.parent.Eject('lisen.html', '', 360, 250);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("lisenAll() 函数出错！请查看hot.html页面或者Handler.ashx页面！");
+                }
+            });
+        }
+        function lisen(a) {
+            var pd = { "t": "lisem", "mp3": a };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1")
+                        window.location.href = "lisen.html";
+                        //window.parent.Eject('lisen.html', 360, 250);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("lisenAll() 函数出错！请查看hot.html页面或者Handler.ashx页面！");
+                }
+            })
+        }
+
+        //she zhi shou cang
+        function setLove(a) {
+            var pd = { "t": "SetLove", "music": a };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1")
+                        alert("收藏成功了");
+                    else
+                        alert("请登录");
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("hot.html setLove error!!");
+                }
+            });
+        }
+    </script>
+
+</head>
+<body>
+    <div style="width:100%;height:1800px;background-color:#fff;">
+        <!--图片循环-->
+        <div id="lb" style="width:900px;height:350px;position:relative;overflow:hidden;text-overflow:clip">
+            <ul>
+                <li><img src="gp/banner1.png" /></li>
+                <li><img src="gp/banner2.png" /></li>
+                <li><img src="gp/banner3.png" /></li>
+            </ul>
+            <div class="imgbanner">
+                <div class="imgbannerDiv">
+                    <img src="gp/banner1.png" />
+                    <img src="gp/banner2.png" />
+                    <img src="gp/banner3.png" />
+                </div>
+            </div>
+        </div>
+        <!--添加一段文字-->
+        <div style="margin-top:10px">
+            <font style="font-size:20px;font-weight:900;margin-left:20px;">猜你喜欢</font>
+        </div>
+        <!--添加几组图片及歌曲名称-->
+        <div id="youlove" style="height:200px;width:100%;margin-top:20px;">
+            <div style="width:160px;height:200px;float:left;margin-left:52px">
+                <img src="OrderImg/1.jpg" style="width:160px;height:160px;cursor:pointer;" />
+                <div style="text-align:center;">红莓花儿开</div>
+                <div style="text-align:center;font-size:8px;">毛不易</div>
+            </div>
+            <div style="width:160px;height:200px;float:left;margin-left:52px">
+                <img src="OrderImg/1.jpg" style="width:160px;height:160px;cursor:pointer;" />
+                <div style="text-align:center;">红莓花儿开</div>
+                <div style="text-align:center;font-size:8px;">毛不易</div>
+            </div>
+            <div style="width:160px;height:200px;float:left;margin-left:52px">
+                <img src="OrderImg/1.jpg" style="width:160px;height:160px;cursor:pointer;" />
+                <div style="text-align:center;">红莓花儿开</div>
+                <div style="text-align:center;font-size:8px;">毛不易</div>
+            </div>
+            <div style="width:160px;height:200px;float:left;margin-left:52px">
+                <img src="OrderImg/1.jpg" style="width:160px;height:160px;cursor:pointer;" />
+                <div style="text-align:center;">红莓花儿开</div>
+                <div style="text-align:center;font-size:8px;">毛不易</div>
+            </div>
+        </div>
+        <!--显示一段文字-->
+        <div style="margin-top:10px;height:40px;">
+            <font style="font-size:20px;font-weight:900;float:left;margin-left:20px">甜橙推荐</font>
+            <div style="height:30px;width:90px;color:white;margin-top:20px;margin-left:60px;line-height:30px;text-align:center;float:right;cursor:pointer;" onclick="lisenAll()">
+                <img src="gp/一键播放.png" />
+            </div>
+        </div>
+        <!--显示推荐的歌曲-->
+        <div id="tuijian" style="margin-top:20px;overflow:hidden">
+        </div>
+        <div style="margin-left:auto;margin-right:auto;width:800px;">
+            <img  src="tools/页脚.png"/>
+        </div>
+    </div>
+</body>
+</html>

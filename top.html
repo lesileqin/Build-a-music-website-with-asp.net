@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <style>
+        .menu{
+            float:left;
+            height:40px;
+            width:100px;
+            line-height:40px;
+            text-align:center;
+            cursor:pointer;
+            font-weight:600;
+            font-size:19px;
+            color:#ffffff;
+        }
+    </style>
+    <script>
+        //单击查询
+        function find() {
+            var findStr = $("#findStr").val();
+            var pd = { "t": "SetFind", "findStr": findStr };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1")
+                        $("#centerHtml").attr("src", "find.html");
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("搜索功能出错！请检查top.html页面的find()方法或者检查Handler.ashx页面的SetFind(str)方法");
+                }
+            });
+        }
+        //单击退出
+        function Out() {
+            var pd = { "t": "OutHtml" };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1")
+                        window.parent.window.location.href = 'index.html';
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("退出功能出错，请检查top.html页面Out方法或者检查Hanler.ashx页面的OutHtml方法");
+                }
+            });
+        }
+        //调用方法
+        $(function () {
+            $("#out").hide();
+            var pd = { "t": "CheckLogin" };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        $("#reg").hide();
+                        $("#login").hide();
+                        $("uName").html(data.status);
+                        $("#out").show();
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("top.html调用方法出错");
+                }
+            });
+        });
+        //单击热门
+        function onclickIndex() {
+            $("#centerHtml").attr("src", "hot.html");
+        }
+        //免费注册
+        function reg() {
+            $("#centerHtml").attr("src", "reg.html");
+        }
+        //登录
+        function login() {
+            $("#centerHtml").attr("src", "login.html");
+        }
+        //单击我的音乐
+        function mymusic() {
+            $("#centerHtml").attr("src", "Mymusic.html");
+        }
+        //上传歌曲
+        function UpMusic() {
+            $("#centerHtml").attr("src", "Upmusic.html");
+        }
+        //单击菜单
+        function ClickMenu(a, b) {
+            $("#centerHtml").attr("src", a);
+            $(".menu").css("background-image", "");
+            $(b).css("background-image", "url(images/鼠标点击.png)");
+        }
+    </script>
+</head>
+<body>
+    <div style="width:900px;position:relative;height:69px;width:900px;margin:auto;">
+        <!--显示网页Logo-->
+        <div style="float:left;padding-top:10px;margin-left:40px;">
+            <img src="images/甜橙音乐网.png" />
+        </div>
+        <div style="width:628px;height:69px;float:left;"></div>
+        <!--显示我的音乐和发现音乐-->
+        <div style="font-weight:900;color:rgb(108,108,108);position:absolute;top:35px;right:410px;font-size:20px;">
+            <font style="cursor:pointer;color:#F59405;" onclick="onclickIndex()">发现音乐</font>
+            <font style="margin-left:40px;cursor:pointer;color:#f59405;" onclick="mymusic()">我的音乐</font>
+        </div>
+        <!--显示登录和注册的一些信息-->
+        <div style="font-weight:300;color:rgb(108,108,108);position:absolute;top:45px;right:40px;font-size:14px;">
+            <font id="reg" style="cursor:pointer;color:#f59405;" onclick="reg()">免费注册</font>
+            <font id="login" style="margin-left:20px;cursor:pointer;color:#f59405;" onclick="login()">立即登录</font>
+            <font id="uName" style="margin-left:20px;cursor:pointer;color:#f59405;"></font>
+            <font id="out" style="margin-left:20px;cursor:pointer;color:#f59405;" onclick="Out()">退出</font>
+        </div>
+    </div>
+        <!--显示Benner-->
+        <div style="height:40px;background-image:url('images/导航底栏_图层 1.jpg')">
+            <div style="width:1100px;margin:auto;">
+                <div class="menu" style="margin-left:100px;background-image:url('images/鼠标点击.png');" onclick="ClickMenu('hot.html',this)">热门</div>
+                <div class="menu" onclick="ClickMenu('Ranking.html',this)">排行榜</div>
+                <div class="menu" onclick="ClickMenu('Album.html',this)">专辑</div>
+                <div class="menu" onclick="ClickMenu('artist.html',this)">艺人</div>
+                <div class="menu" onclick="ClickMenu('Style.html',this)">风格</div>
+                <div style="float:right;margin-top:10px;margin-right:130px;">
+                    <input id="findStr" type="text" placeholder="音乐搜索" />
+                    <input type="button" value="搜索" onclick="find()"/>
+                    <!--<font style="color:#fff;margin-left:10px;font-size:13px;" onclick="find()">查询</font>-->
+                </div>
+            </div>
+        </div>
+</body>
+</html>

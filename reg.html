@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+    <script src="js/jquery.min.js"></script>
+    <script>
+        function ClickReg() {
+            var userName = $('#userName').val();
+            var pwd = $('#pwd').val();
+            var pwd2 = $('#pwd2').val();
+            if (userName == "" || pwd == "" || pwd2 == "")
+            {
+                alert('用户名密码不能为空');
+                return;
+            }
+            if (pwd != pwd2) {
+                alert('两次密码不同');
+                return;
+            }
+            var pd = { "t": "reg", "userName": userName, "pwd": pwd };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        window.parent.location.href = 'index.html';
+                    }
+                    else {
+                        alert('用户名重复！');
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(textStatus);
+                }
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div style="width:100%; height:500px;background-color:#fff;">
+        <div style="float:left;margin-top:70px;margin-left:60px;width:300px;line-height:40px;border:1px solid #dedede;height:300px;border-radius:20px;">
+            <div style="margin-top:70px;margin-left:10px;">
+                <div><font>用户名：</font><input id="userName" type="text" style="margin-left:15px;height:30px;border:1px solid #dedede;width:200px;" /></div>
+                <div><font>密码：</font><input id="pwd" type="password" style="margin-left:30px;height:30px;border:1px solid #dedede;width:200px;" /></div>
+                <div><font>确认密码：</font><input id="pwd2" type="password" style="height:30px;border:1px solid #dedede;width:200px;" /></div>
+                <div><img src="gp/注册按键.png" onclick="ClickReg()" style="cursor:pointer;margin-left:100px;margin-top:20px;" /></div>
+            </div>
+
+        </div>
+        <div style="float:right;margin-top:60px;margin-right:60px;">
+            <img src="gp/图片.png" style="" />
+        </div>
+    </div>
+        
+</body>
+</html>

@@ -1,0 +1,201 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link href="css/css.css" rel="stylesheet" />
+    <script src="js/jquery.min.js"></script>
+    <style>
+        /*所有标签都用统一样式*/
+        * {
+            padding: 0px;
+            margin: 0px;
+            font-family: "Comic Sans MS","微软雅黑",sans-serif;
+            color: #7F7F7F;
+        }
+        /*左菜单样式*/
+        .leftmenu {
+            width: 100px;
+            height: 100px;
+            text-align: center;
+            line-height: 130px;
+            margin: auto;
+            margin-top: 30px;
+            cursor: pointer;
+        }
+        /*选中样式*/
+        .selectLeftMenu {
+            background-color: rgb(255, 139, 27);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+        /*语言样式*/
+        .topMenu {
+            height: 50px;
+            width: 70px;
+            float: left;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        var phType = '';//排行类型
+        var country = '';//国家
+        var pageInt = 1;//第几页
+        var pageCount = 5;//一页多少条
+        var count = 1; //当前是第几条
+        $(function () {
+            tuijina();
+        });
+        //获取推荐
+        function tuijina() {
+            var pd = { "t": "GetRank", "phType": phType, "country": country, "pageInt": pageInt, "pageCount": pageCount };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        //$('#rank').empty();
+                        var dataobj = eval("(" + data.status + ")");
+                        $.each(dataobj.root, function (i, item) {
+                            var html = ' <div style="margin-top:20px;border:1px solid #b7b7b7;border-left:none;border-right:none;border-top:none; height:100px;padding-top:10px;padding-bottom:10px;width:100%;">' +
+                                ' <div style="float:left;height:100px;line-height:100px;margin-left:40px;"><input name="music" type="checkbox" value="' + item.musicPath + '" /></div>' +
+                                ' <div style="float:left;height:100px;line-height:100px;margin-left:40px;"><font style="font-size:20px;">' + count + '</font></div>' +
+                                ' <div style="float:left;height:100px;line-height:100px;margin-left:40px;"><img src="' + item.imgs + '" style="height:100px;width:100px;" /></div>' +
+                                ' <div style="float:left;height:50px;margin-left:20px;width:200px;margin-top:50px;">' + item.musicName + '<br />' + item.singerName + '</div>' +
+                                ' <div style="float:left;height:50px;margin-left:80px;width:50px;margin-top:50px;cursor:pointer;" onclick="linsen(\'' + item.musicPath + '\')"><img src="gp/播放.png" /></div>' +
+                                ' <div style="float:left;height:50px;margin-left:0px;width:50px;margin-top:50px;cursor:pointer;" onclick="down(\'' + item.musicPath + '\')"><img src="gp/下载.png" /></div>' +
+                                '</div>';
+                            $('#rank').append(html);
+                            count++;
+                        });
+                        $('#addMore').show();
+                    }
+                    else {
+                        $('#addMore').hide();
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                }
+            });
+        }
+        //设置国家
+        function conClick(a, b) {
+            $('#rank').empty();
+            count = 1;
+            country = a;
+            pageInt = 1;
+            tuijina();
+            $('.topMenu').css('color', '#000');
+            $(b).css('color', '#F59405')
+        }
+        //设置排行类型
+        function setClass(a, b) {
+            $('#rank').empty();
+            count = 1;
+            phType = a;
+            pageInt = 1;
+            tuijina();
+            $('.selectLeftMenu').attr('class', 'leftmenu');
+            $(b).attr('class', 'leftmenu selectLeftMenu');
+        }
+        //试听
+        function linsen(a) {
+            var pd = { "t": "lisem", "mp3": a };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    if (data.status != "-1") {
+                        window.parent.Eject('lisen.html', '', 360, 250);
+                    }
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                }
+            });
+        }
+        //下载
+        function down(a) {
+            //var Pop = window.open('musicFile/' + a);
+            var pd = { "t": "Down", "file": "musicFile/" + a };
+            $.ajax({
+                type: "post",
+                url: "tools/Handler.ashx",
+                data: pd,
+                dataType: "json",
+                success: function (data) {
+                    window.open("musicFile/" + data.status);
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    alert(textStatus);
+                }
+            });
+        }
+        //点击加载更多
+        function add() {
+            //当前页数加1
+            pageInt += 1;
+            //调用查询方法
+            tuijina()
+        }
+        //播放所选
+        function lisenAll() {
+            var musiclist = '';
+            $('input[name = "music"]:checked').each(function () {
+                musiclist += $(this).val() + ";";
+            });
+            if (musiclist == '') {
+                alert('您没有选中任何音乐');
+                return;
+            }
+            linsen(musiclist);
+        }
+    </script>
+</head>
+<body>
+    <!--排行分类-->
+    <div style="height:800px;width:180px;border:1px solid #b7b7b7; float:left;margin-left:20px;">
+        <div style="width:100%;height:50px;font-size:20px;font-weight:900;text-align:center;margin-top:30px;color:#F59405">甜橙音乐网</div>
+        <div class="leftmenu" onclick="setClass(0,this)" style="background-image:url(gp/原创排行榜.png)"></div>
+        <div class="leftmenu" onclick="setClass(1,this)" style="background-image:url(gp/新歌排行榜.png)"></div>
+        <div class="leftmenu" onclick="setClass(2,this)" style="background-image:url(gp/甜橙音乐排行榜.png)"></div>
+    </div>
+    <!--语言分类-->
+    <div style="width:681px;height:800px;float:right;">
+        <div style="border-bottom:1px solid #b7b7b7;height:50px;border-top:1px solid #b7b7b7;">
+            <div class="topMenu" style="color:#F59405" onclick="conClick('',this)">
+                全部
+            </div>
+            <div class="topMenu" onclick="conClick('华语',this)">
+                华语
+            </div>
+            <div class="topMenu" onclick="conClick('欧美',this)">
+                欧美
+            </div>
+            <div class="topMenu" onclick="conClick('日本',this)">
+                日本
+            </div>
+            <div class="topMenu" onclick="conClick('韩国',this)">
+                韩国
+            </div>
+            <div style="height: 50px;width: 120px;float:right;text-align: center;line-height: 50px;cursor:pointer;margin-right:70px;">
+                <div style="height:30px;width:90px;margin-top:10px;margin-left:60px;line-height:30px;text-align:center;float:left;cursor:pointer;" onclick="lisenAll()"><img src="gp/一键播放.png" /></div>
+            </div>
+        </div>
+        <!--显示歌曲-->
+        <div id="rank">
+
+        </div>
+        <!--获取更多-->
+        <div id="addMore" style="text-align:center;height:200px;">
+            <div style="height:60px;background-color:rgb(255, 106,0);border-radius:20px;margin-top:20px;color:white;font-weight:900;line-height:60px;cursor:pointer;" onclick="add()">点击加载更多</div>
+        </div>
+    </div>
+</body>
+</html>
